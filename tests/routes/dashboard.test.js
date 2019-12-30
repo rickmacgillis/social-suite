@@ -4,21 +4,25 @@ const dbFixtures = require('../fixtures/db.js');
 
 beforeEach(dbFixtures.setupDatabase);
 
-test('Should allow authenticated user to view dashboard', async () => {
+describe('Dashboard Test Suite', () => {
 
-    await request(app)
-        .get('/')
-        .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
-        .send()
-        .expect(200);
+    test('Should allow authenticated user to view dashboard', async () => {
 
-});
+        await request(app)
+            .get('/')
+            .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
+            .send()
+            .expect(200);
 
-test('Should not allow unauthenticated user to view dashboard', async () => {
+    });
 
-    await request(app)
-        .get('/')
-        .send()
-        .expect(401);
+    test('Should not allow unauthenticated user to view dashboard', async () => {
+
+        await request(app)
+            .get('/')
+            .send()
+            .expect(401);
+
+    });
 
 });

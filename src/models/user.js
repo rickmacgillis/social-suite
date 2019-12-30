@@ -3,6 +3,24 @@ const validator = require('validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const passwordValidator = require('password-validator');
+const uuid = require('uuid/v4');
+const Account = require('./account.js');
+
+const validatePassword = (value) => {
+
+    const validatorSchema = new passwordValidator();
+    validatorSchema
+        .is().min(16)
+        .has().uppercase()
+        .has().lowercase()
+        .has().digits()
+        .has().symbols();
+
+    if (validatorSchema.validate(value) === false) {
+        throw new Error('Password must contain uppercase and lowercase letters, numbers, and special characters.');
+    }
+
+}
 
 const UserSchema = new mongoose.Schema({
     email: {
@@ -24,20 +42,11 @@ const UserSchema = new mongoose.Schema({
         required: true,
         trim: true,
         validate(value) {
-
-            const validatorSchema = new passwordValidator();
-            validatorSchema
-                .is().min(16)
-                .has().uppercase()
-                .has().lowercase()
-                .has().digits()
-                .has().symbols();
-
-            if (validatorSchema.validate(value) === false) {
-                throw new Error('Password must contain uppercase and lowercase letters, numbers, and special characters.');
-            }
-
+            validatePassword(value);
         },
+    },
+    passwordReset: {
+        type: String,
     },
     tokens: [{
         token: {
@@ -49,13 +58,29 @@ const UserSchema = new mongoose.Schema({
     timestamps: true,
 });
 
+UserSchema.virtual('accounts', {
+    ref: 'Account',
+    localField: '_id',
+    foreignField: 'owner',
+});
+
 UserSchema.methods.toJSON = function () {
 
     const user = this.toObject();
     delete user.password;
+    delete user.passwordReset;
     delete user.tokens;
 
     return user;
+
+};
+
+UserSchema.methods.getAccounts = async function () {
+
+    const user = this;
+    await user.populate({ path: 'accounts' }).execPopulate();
+
+    return user.accounts;
 
 };
 
@@ -70,6 +95,19 @@ UserSchema.methods.generateAuthToken = async function () {
     return token;
 
 }
+
+UserSchema.methods.generatePasswordPresetToken = async function () {
+
+    const user = this;
+    
+    user.passwordReset = uuid();
+    await user.save();
+
+    return user.passwordReset;
+    
+}
+
+UserSchema.statics.validatePassword = validatePassword;
 
 UserSchema.statics.findByCredentials = async function (email, password) {
 
@@ -94,6 +132,15 @@ UserSchema.pre('save', async function (next) {
         user.password = await bcrypt.hash(user.password, 8);
     }
     
+    next();
+
+});
+
+UserSchema.pre('remove', async function (next) {
+    
+    const user = this;
+    await Account.deleteMany({ owner: user._id });
+
     next();
 
 });
