@@ -1,0 +1,42 @@
+{
+  "name": "social-suite",
+  "version": "1.0.0",
+  "description": "Open source social post scheduling system",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "watch": "env-cmd -f config/dev.env nodemon src/index.js",
+    "test": "env-cmd -f ./config/test.env jest --watch --runInBand"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "keywords": [
+    "social",
+    "post",
+    "hootsuite",
+    "schedule",
+    "facebook",
+    "twitter",
+    "linkedin",
+    "instagram"
+  ],
+  "author": "Rick Mac Gillis",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^3.0.7",
+    "cron": "^1.7.2",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.4.1",
+    "mongoose": "^5.8.3",
+    "password-validator": "^5.0.3",
+    "validator": "^12.1.0"
+  },
+  "devDependencies": {
+    "env-cmd": "^10.0.1",
+    "jest": "^24.9.0",
+    "nodemon": "^2.0.2",
+    "supertest": "^4.0.2"
+  }
+}
