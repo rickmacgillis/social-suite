@@ -1,4 +1,4 @@
-const twitter = require('../../../src/drivers/social/twitter/twitter.js');
+const twitter = require('../../../src/drivers/social/twitter.js');
 
 describe.skip('Twitter Driver Test Suite', () => {
 
