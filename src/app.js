@@ -11,13 +11,16 @@ const publicDir = require('social-suite-' + frontend + '/node/index');
 const app = express();
 
 app.use(express.static(publicDir));
+
 app.use(express.json());
-app.use(accountsRoutes);
-app.use(userRoutes);
-app.use(dashboardRoutes);
+app.use('/api/v1', accountsRoutes);
+app.use('/api/v1', dashboardRoutes);
+app.use('/api/v1', userRoutes);
 
 app.get('*', async (req, res) => {
-    res.status(404).send('Not Found');
+    res.status(404).send({
+        error: 'Not Found',
+    });
 });
 
 module.exports = app;
