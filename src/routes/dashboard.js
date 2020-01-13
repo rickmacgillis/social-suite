@@ -3,7 +3,7 @@ const auth = require('../middleware/auth.js');
 
 const router = express.Router();
 
-router.get('/', auth, async (req, res) => {
+router.get('/dashboard', auth, async (req, res) => {
     res.send('Dashboard');
 });
 
