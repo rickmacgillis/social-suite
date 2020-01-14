@@ -16,7 +16,7 @@ describe('Users Test Suite', () => {
         };
 
         const res = await request(app)
-            .post('/users')
+            .post('/api/v1/users')
             .send(newUser)
             .expect(201);
 
@@ -34,6 +34,8 @@ describe('Users Test Suite', () => {
             token: user.tokens[0].token,
         });
 
+        expect(res.body.tokenExpires).toBeDefined();
+
     });
 
     test('Should not create user with invalid email', async () => {
@@ -44,7 +46,7 @@ describe('Users Test Suite', () => {
         };
 
         await request(app)
-            .post('/users')
+            .post('/api/v1/users')
             .send(newUser)
             .expect(422);
 
@@ -59,7 +61,7 @@ describe('Users Test Suite', () => {
     test('Should not create user with invalid password', async () => {
 
         await request(app)
-            .post('/users')
+            .post('/api/v1/users')
             .send({
                 email: 'test3@example.com',
                 password: 'passwordpassword',
@@ -68,7 +70,7 @@ describe('Users Test Suite', () => {
 
         
         await request(app)
-            .post('/users')
+            .post('/api/v1/users')
             .send({
                 email: 'test3@example.com',
                 password: 'passwordpasswor1',
@@ -76,7 +78,7 @@ describe('Users Test Suite', () => {
             .expect(422);
 
         await request(app)
-            .post('/users')
+            .post('/api/v1/users')
             .send({
                 email: 'test3@example.com',
                 password: 'Passwordpasswor1',
@@ -84,7 +86,7 @@ describe('Users Test Suite', () => {
             .expect(422);
 
         await request(app)
-            .post('/users')
+            .post('/api/v1/users')
             .send({
                 email: 'test3@example.com',
                 password: 'P@sswordshort1',
@@ -96,7 +98,7 @@ describe('Users Test Suite', () => {
     test('Should allow user to log in with valid credentials', async () => {
 
         const res = await request(app)
-            .post('/users/login')
+            .post('/api/v1/users/login')
             .send({
                 email: dbFixtures.userOne.email,
                 password: dbFixtures.userOne.password,
@@ -106,13 +108,14 @@ describe('Users Test Suite', () => {
         const user = await User.findOne({ email: dbFixtures.userOne.email });
         expect(user).not.toBeNull();
         expect(res.body.token).toBe(user.tokens[1].token);
+        expect(res.body.tokenExpires).toBeDefined();
 
     });
 
     test('Should not allow user to log in with invalid credentials', async () => {
 
         await request(app)
-            .post('/users/login')
+            .post('/api/v1/users/login')
             .send({
                 email: "wrong@example.com",
                 password: "BadPass",
@@ -124,7 +127,7 @@ describe('Users Test Suite', () => {
     test('Should allow user to delete own account', async () => {
 
         await request(app)
-            .delete('/users/me')
+            .delete('/api/v1/users/me')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send()
             .expect(200);
@@ -134,7 +137,7 @@ describe('Users Test Suite', () => {
     test('Should allow authenticated user to logout', async () => {
 
         await request(app)
-            .post('/users/logout')
+            .post('/api/v1/users/logout')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send()
             .expect(200);
@@ -144,7 +147,7 @@ describe('Users Test Suite', () => {
     test('Should not allow unauthenticated user to logout', async () => {
 
         await request(app)
-            .post('/users/logout')
+            .post('/api/v1/users/logout')
             .send()
             .expect(401);
 
@@ -155,7 +158,7 @@ describe('Users Test Suite', () => {
         const email = 'NewEmail@example.com';
         const newPass = 'newZ@92eNcm#VbiyxSF';
         const response = await request(app)
-            .patch('/users/me')
+            .patch('/api/v1/users/me')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send({
                 email,
@@ -178,7 +181,7 @@ describe('Users Test Suite', () => {
     test('Should not update user with invalid email', async () => {
 
         const response = await request(app)
-            .patch('/users/me')
+            .patch('/api/v1/users/me')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send({ email: 'badEmail' })
             .expect(422);
@@ -188,7 +191,7 @@ describe('Users Test Suite', () => {
     test('Should not update user with invalid password', async () => {
 
         const response = await request(app)
-            .patch('/users/me')
+            .patch('/api/v1/users/me')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send({ password: 'badPass' })
             .expect(422);
@@ -198,7 +201,7 @@ describe('Users Test Suite', () => {
     test('Should not update user with invalid fields', async () => {
 
         const response = await request(app)
-            .patch('/users/me')
+            .patch('/api/v1/users/me')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send({ junk: 'blah' })
             .expect(422);
@@ -210,7 +213,7 @@ describe('Users Test Suite', () => {
         const email = 'NewEmail@example.com';
         const newPass = 'newZ@92eNcm#VbiyxSF';
         const response = await request(app)
-            .patch('/users/me')
+            .patch('/api/v1/users/me')
             .send({
                 email,
                 password: newPass,
@@ -222,7 +225,7 @@ describe('Users Test Suite', () => {
     test('Should get logged in user\'s profile', async () => {
 
         const response = await request(app)
-            .get('/users/me')
+            .get('/api/v1/users/me')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send()
             .expect(200);
@@ -238,7 +241,7 @@ describe('Users Test Suite', () => {
     test('Should not get profile for unauthorized user', async () => {
 
         await request(app)
-            .get('/users/me')
+            .get('/api/v1/users/me')
             .send()
             .expect(401);
 
@@ -247,7 +250,7 @@ describe('Users Test Suite', () => {
     test('Should reset password for valid user', async () => {
 
         await request(app)
-            .post('/users/reset-password')
+            .post('/api/v1/users/reset-password')
             .send({
                 email: dbFixtures.userOne.email,
             })
@@ -262,7 +265,7 @@ describe('Users Test Suite', () => {
     test('Should not reset password for nonexistant user', async () => {
 
         await request(app)
-            .post('/users/reset-password')
+            .post('/api/v1/users/reset-password')
             .send({
                 email: 'wrong@example.com',
             })
@@ -276,7 +279,7 @@ describe('Users Test Suite', () => {
     test('Should give an error when no email specified', async () => {
 
         const response = await request(app)
-            .post('/users/reset-password')
+            .post('/api/v1/users/reset-password')
             .send()
             .expect(422);
 
@@ -287,7 +290,7 @@ describe('Users Test Suite', () => {
     test('Should load password reset page', async () => {
 
         await request(app)
-            .get('/users/reset-password')
+            .get('/api/v1/users/reset-password')
             .send()
             .expect(200);
 
@@ -296,7 +299,7 @@ describe('Users Test Suite', () => {
     test('Should load password reset confirmation page with token', async () => {
 
         await request(app)
-            .get('/users/reset-password-confirm?token=test')
+            .get('/api/v1/users/reset-password-confirm?token=test')
             .send()
             .expect(200);
 
@@ -305,7 +308,7 @@ describe('Users Test Suite', () => {
     test('Should not load password reset confirmation page without token', async () => {
 
         await request(app)
-            .get('/users/reset-password-confirm')
+            .get('/api/v1/users/reset-password-confirm')
             .send()
             .expect(422);
 
@@ -318,7 +321,7 @@ describe('Users Test Suite', () => {
         const token = await userBefore.generatePasswordPresetToken();
 
         await request(app)
-            .patch('/users/reset-password')
+            .patch('/api/v1/users/reset-password')
             .send({
                 token: token,
                 password: newPass,
@@ -337,7 +340,7 @@ describe('Users Test Suite', () => {
     test('Should send error for missing token or password', async () => {
 
         const response = await request(app)
-            .patch('/users/reset-password')
+            .patch('/api/v1/users/reset-password')
             .send()
             .expect(422);
 
@@ -349,7 +352,7 @@ describe('Users Test Suite', () => {
 
         const newPass = 'newZ@92eNcm#VbiyxSF';
         await request(app)
-            .patch('/users/reset-password')
+            .patch('/api/v1/users/reset-password')
             .send({
                 token: 'bad',
                 password: newPass,
@@ -362,7 +365,7 @@ describe('Users Test Suite', () => {
     test('Should validate password even if user is invalid', async () => {
 
         const response = await request(app)
-            .patch('/users/reset-password')
+            .patch('/api/v1/users/reset-password')
             .send({
                 token: 'bad',
                 password: 'wrong',

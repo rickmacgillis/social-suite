@@ -14,7 +14,7 @@ describe('Account Connectivity Test Suite', () => {
         const accessTokenSecret = 'testSecret';
 
         await request(app)
-            .post('/accounts/twitter')
+            .post('/api/v1/accounts/twitter')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send({ accessTokenKey, accessTokenSecret })
             .expect(201);
@@ -39,13 +39,13 @@ describe('Account Connectivity Test Suite', () => {
         const accessTokenSecret = 'testSecret';
 
         await request(app)
-            .post('/accounts/twitter')
+            .post('/api/v1/accounts/twitter')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send({ accessTokenKey, accessTokenSecret })
             .expect(201);
 
         const response = await request(app)
-            .post('/accounts/twitter')
+            .post('/api/v1/accounts/twitter')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send({ accessTokenKey, accessTokenSecret })
             .expect(400);
@@ -57,7 +57,7 @@ describe('Account Connectivity Test Suite', () => {
     test('Should not populate empty Twitter credentials', async () => {
 
         await request(app)
-            .post('/accounts/twitter')
+            .post('/api/v1/accounts/twitter')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send()
             .expect(422);
@@ -70,7 +70,7 @@ describe('Account Connectivity Test Suite', () => {
         const accessTokenSecret = 'testSecret';
 
         await request(app)
-            .post('/accounts/twitter')
+            .post('/api/v1/accounts/twitter')
             .send({ accessTokenKey, accessTokenSecret })
             .expect(401);
 
@@ -79,7 +79,7 @@ describe('Account Connectivity Test Suite', () => {
     test('Should delete Twitter credentials for current user', async () => {
 
         await request(app)
-            .post('/accounts/twitter')
+            .post('/api/v1/accounts/twitter')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send({
                 accessTokenKey: 'testKey',
@@ -88,7 +88,7 @@ describe('Account Connectivity Test Suite', () => {
             .expect(201);
 
         await request(app)
-            .delete('/accounts/twitter')
+            .delete('/api/v1/accounts/twitter')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send()
             .expect(200);
@@ -104,7 +104,7 @@ describe('Account Connectivity Test Suite', () => {
     test('Should not delete Twitter credentials when not logged in', async () => {
 
         await request(app)
-            .delete('/accounts/twitter')
+            .delete('/api/v1/accounts/twitter')
             .send()
             .expect(401);
 
@@ -113,7 +113,7 @@ describe('Account Connectivity Test Suite', () => {
     test('Should list providers for user', async () => {
 
         const responseNoProviders = await request(app)
-            .get('/accounts')
+            .get('/api/v1/accounts')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send()
             .expect(200);
@@ -122,7 +122,7 @@ describe('Account Connectivity Test Suite', () => {
         expect(responseNoProviders.body.providers).toHaveLength(0);
 
         await request(app)
-            .post('/accounts/twitter')
+            .post('/api/v1/accounts/twitter')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send({
                 accessTokenKey: 'testKey',
@@ -131,7 +131,7 @@ describe('Account Connectivity Test Suite', () => {
             .expect(201);
 
         const responseWithTwitter = await request(app)
-            .get('/accounts')
+            .get('/api/v1/accounts')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send()
             .expect(200);

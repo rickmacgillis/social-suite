@@ -9,7 +9,9 @@ const userOne = {
     email: 'test@example.com',
     password: 'dw7IMkdpwK6WK%fV',
     tokens: [{
-        token: jwt.sign({ _id: userOneId.toString() }, process.env.JWT_SECRET),
+        token: jwt.sign({ _id: userOneId.toString() }, process.env.JWT_SECRET, {
+            expiresIn: process.env.JWT_EXPIRES,
+        }),
     }],
 };
 
@@ -19,7 +21,9 @@ const userTwo = {
     email: 'test2@example.com',
     password: 'ooQxrWn5ioTV28@X',
     tokens: [{
-        token: jwt.sign({ _id: userTwoId.toString() }, process.env.JWT_SECRET),
+        token: jwt.sign({ _id: userTwoId.toString() }, process.env.JWT_SECRET, {
+            expiresIn: process.env.JWT_EXPIRES,
+        }),
     }],
 };
 

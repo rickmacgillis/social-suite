@@ -10,7 +10,7 @@ const accountSchema = new mongoose.Schema({
         trim: true,
         validate(value) {
 
-            const driverPath = path.join(__dirname, `../drivers/social/${value}/${value}.js`);
+            const driverPath = path.join(__dirname, `../drivers/social/${value}.js`);
             return value.indexOf('/') === -1 && fs.existsSync(driverPath);
 
         },

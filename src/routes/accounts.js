@@ -57,7 +57,7 @@ router.post('/accounts/twitter', auth, async (req, res) => {
         res.status(201).send();
 
     } catch (error) {
-
+        
         res.status(400).send({
             error: 'Did you already add credentials for this provider?',
         });

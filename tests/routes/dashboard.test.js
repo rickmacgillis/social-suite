@@ -9,7 +9,7 @@ describe('Dashboard Test Suite', () => {
     test('Should allow authenticated user to view dashboard', async () => {
 
         await request(app)
-            .get('/')
+            .get('/api/v1/dashboard')
             .set('Authorization', `Bearer ${dbFixtures.userOne.tokens[0].token}`)
             .send()
             .expect(200);
@@ -19,7 +19,7 @@ describe('Dashboard Test Suite', () => {
     test('Should not allow unauthenticated user to view dashboard', async () => {
 
         await request(app)
-            .get('/')
+            .get('/api/v1/dashboard')
             .send()
             .expect(401);
 
