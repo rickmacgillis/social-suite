@@ -34,7 +34,7 @@ describe('Users Test Suite', () => {
             token: user.tokens[0].token,
         });
 
-        expect(res.body.tokenExpires).toBeDefined();
+        expect(res.body.expiresIn).toBeDefined();
 
     });
 
@@ -45,7 +45,7 @@ describe('Users Test Suite', () => {
             password: '63h2qbKs#JZ4ZCMn',
         };
 
-        await request(app)
+        const response = await request(app)
             .post('/api/v1/users')
             .send(newUser)
             .expect(422);
@@ -55,18 +55,23 @@ describe('Users Test Suite', () => {
         });
 
         expect(user).toBeNull();
+        expect(response.body.error).toBeDefined();
+        expect(response.body.error).toStartWith('User validation failed:');
 
     });
 
     test('Should not create user with invalid password', async () => {
 
-        await request(app)
+        const response = await request(app)
             .post('/api/v1/users')
             .send({
                 email: 'test3@example.com',
                 password: 'passwordpassword',
             })
             .expect(422);
+
+        expect(response.body.error).toBeDefined();
+        expect(response.body.error).toStartWith('User validation failed:');
 
         
         await request(app)
@@ -108,19 +113,23 @@ describe('Users Test Suite', () => {
         const user = await User.findOne({ email: dbFixtures.userOne.email });
         expect(user).not.toBeNull();
         expect(res.body.token).toBe(user.tokens[1].token);
-        expect(res.body.tokenExpires).toBeDefined();
+        expect(res.body.expiresIn).toBeDefined();
 
     });
 
     test('Should not allow user to log in with invalid credentials', async () => {
 
-        await request(app)
+        const response = await request(app)
             .post('/api/v1/users/login')
             .send({
                 email: "wrong@example.com",
                 password: "BadPass",
             })
             .expect(401);
+
+        expect(response.body).toMatchObject({
+            error: 'Unable to login.',
+        });
 
     });
 
@@ -284,33 +293,6 @@ describe('Users Test Suite', () => {
             .expect(422);
 
         expect(response.body.error).toBeDefined();
-
-    });
-
-    test('Should load password reset page', async () => {
-
-        await request(app)
-            .get('/api/v1/users/reset-password')
-            .send()
-            .expect(200);
-
-    });
-
-    test('Should load password reset confirmation page with token', async () => {
-
-        await request(app)
-            .get('/api/v1/users/reset-password-confirm?token=test')
-            .send()
-            .expect(200);
-
-    });
-
-    test('Should not load password reset confirmation page without token', async () => {
-
-        await request(app)
-            .get('/api/v1/users/reset-password-confirm')
-            .send()
-            .expect(422);
 
     });
 

@@ -15,10 +15,14 @@ router.post('/users', async (req, res) => {
         await user.save();
         const token = await user.generateAuthToken();
         const { exp } = jwtDecode(token);
-        res.status(201).send({ user, token, tokenExpires: exp });
+        res.status(201).send({ user, token, expiresIn: exp });
 
     } catch (error) {
-        res.status(422).send(error);
+
+        res.status(422).send({
+            error: error.message,
+        });
+        
     }
 
 });
@@ -30,10 +34,14 @@ router.post('/users/login', async (req, res) => {
         const user = await User.findByCredentials(req.body.email, req.body.password);
         const token = await user.generateAuthToken();
         const { exp } = jwtDecode(token);
-        res.send({ user, token, tokenExpires: exp });
+        res.send({ user, token, expiresIn: exp });
 
     } catch (error) {
-        res.status(401).send();
+
+        res.status(401).send({
+            error: error.message,
+        });
+        
     }
 
 });
@@ -75,7 +83,7 @@ router.patch('/users/me', auth, async (req, res) => {
         res.send(req.user);
 
     } catch (error) {
-        res.status(422).send(error);
+        res.status(422).send({ error: error.message });
     }
 
 });
@@ -94,10 +102,14 @@ router.delete('/users/me', auth, async (req, res) => {
 
     try {
 
-        await User.deleteOne({ _id: req.user._id });
+        // Deactivated in production for now.
+        if (process.env.APP_ENV !== 'prod') {
+            await User.deleteOne({ _id: req.user._id });
+        }
+        
         res.send(req.user)
 
-    } catch (error) {console.log(error);
+    } catch (error) {
         res.status(500).send();
     }
 
@@ -130,21 +142,6 @@ router.post('/users/reset-password', async (req, res) => {
     } catch (error) {
         res.send();
     }
-
-});
-
-router.get('/users/reset-password', async (req, res) => {
-    res.send('Start password reset');
-});
-
-router.get('/users/reset-password-confirm', async (req, res) => {
-
-    const token = req.query.token;
-    if (token === undefined) {
-        return res.status(422).send('Missing token');
-    }
-
-    res.send('Confirm password reset by selecting a new pass');
 
 });
 

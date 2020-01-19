@@ -11,7 +11,7 @@ module.exports = {
             from: process.env.MAIL_FROM,
             subject: 'Password Reset',
             text: "Your password has been reset. If you didn't request this email, just ignore it.\n" +
-                "To reset your password, please go to " + process.env.APP_URL + "/users/reset-password?token=" + user.passwordReset,
+                "To reset your password, please go to " + process.env.APP_URL + "/auth/reset-password-confirm?token=" + user.passwordReset,
         });
 
     }

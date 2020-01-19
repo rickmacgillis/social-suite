@@ -138,6 +138,22 @@ UserSchema.pre('save', async function (next) {
 
 });
 
+UserSchema.post('save', async function (error, doc, next) {
+
+    if (error.name === 'MongoError') {
+        next(new Error('An error occurred.'));
+    } else if (error.name === 'ValidationError') {
+
+        for (field in error.errors) {
+            return next(new Error(error.errors[field].message));
+        }
+
+    } else {
+        next(error);
+    }
+
+});
+
 UserSchema.pre('remove', async function (next) {
     
     const user = this;

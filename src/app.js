@@ -1,8 +1,9 @@
 const express = require('express');
 
-const accountsRoutes = require('./routes/accounts.js');
-const userRoutes = require('./routes/users.js');
-const dashboardRoutes = require('./routes/dashboard.js');
+const accountsRoutes = require('./routes/accounts');
+const userRoutes = require('./routes/users');
+const dashboardRoutes = require('./routes/dashboard');
+const cors = require('./middleware/cors');
 require('./db.js');
 
 const frontend = process.env.APP_FRONTEND.toLowerCase();
@@ -13,6 +14,7 @@ const app = express();
 app.use(express.static(publicDir));
 
 app.use(express.json());
+app.use(cors);
 app.use('/api/v1', accountsRoutes);
 app.use('/api/v1', dashboardRoutes);
 app.use('/api/v1', userRoutes);
