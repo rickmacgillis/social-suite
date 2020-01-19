@@ -10,7 +10,9 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["jest-extended"]
+    "setupFilesAfterEnv": [
+      "jest-extended"
+    ]
   },
   "keywords": [
     "social",
@@ -25,14 +27,14 @@
   "author": "Rick Mac Gillis",
   "license": "MIT",
   "dependencies": {
-    "@sendgrid/mail": "^6.4.0",
+    "@sendgrid/mail": "^6.5.0",
     "bcrypt": "^3.0.7",
-    "cron": "^1.7.2",
+    "cron": "^1.8.1",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^2.2.0",
-    "mongodb": "^3.4.1",
-    "mongoose": "^5.8.7",
+    "mongodb": "^3.5.1",
+    "mongoose": "^5.8.9",
     "node-uuid": "^1.4.8",
     "passport": "^0.4.1",
     "passport-linkedin-oauth2": "^2.0.0",
