@@ -11,4 +11,7 @@ passport.use(new LinkedInStrategy({
     return done(null, profile);
 }));
 
-module.export = {};
+module.exports = {
+    passport: passport,
+    strategyName: 'linkedin',
+};
