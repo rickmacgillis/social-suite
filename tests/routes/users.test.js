@@ -56,7 +56,7 @@ describe('Users Test Suite', () => {
 
         expect(user).toBeNull();
         expect(response.body.error).toBeDefined();
-        expect(response.body.error).toStartWith('User validation failed:');
+        expect(response.body.error).toBe('Email is invalid');
 
     });
 
@@ -71,7 +71,7 @@ describe('Users Test Suite', () => {
             .expect(422);
 
         expect(response.body.error).toBeDefined();
-        expect(response.body.error).toStartWith('User validation failed:');
+        expect(response.body.error).toBe('Password must contain uppercase and lowercase letters, numbers, and special characters.');
 
         
         await request(app)

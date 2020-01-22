@@ -1,6 +1,23 @@
 const mongoose = require('mongoose');
+const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
 const path = require('path');
 const fs = require('fs');
+
+const CredentialSchema = new mongoose.Schema({
+    type: {
+        required: true,
+        type: String,
+    },
+    value: {
+        required: true,
+        type: String,
+    },
+});
+
+CredentialSchema.plugin(mongooseFieldEncryption, {
+    fields: ["value"],
+    secret: process.env.MONGOOSE_ENCRYPTION_KEY,
+});
 
 const accountSchema = new mongoose.Schema({
     provider: {
@@ -11,22 +28,11 @@ const accountSchema = new mongoose.Schema({
         validate(value) {
 
             const driverPath = path.join(__dirname, `../drivers/social/${value}.js`);
-            return value.indexOf('/') === -1 && fs.existsSync(driverPath);
+            return !!value.match(/^[a-z]*$/i) && fs.existsSync(driverPath);
 
         },
     },
-    credentials: [
-        {
-            type: {
-                required: true,
-                type: String,
-            },
-            value: {
-                required: true,
-                type: String,
-            },
-        }
-    ],
+    credentials: [CredentialSchema],
     owner: {
         required: true,
         type: mongoose.Schema.Types.ObjectId,
@@ -35,6 +41,22 @@ const accountSchema = new mongoose.Schema({
 });
 
 accountSchema.index({ provider: 1, owner: 1 }, { unique: true });
+
+accountSchema.post('save', async function (error, doc, next) {
+
+    if (error.name === 'MongoError') {
+        next(new Error('An error occurred.'));
+    } else if (error.name === 'ValidationError') {
+
+        for (field in error.errors) {
+            return next(new Error(error.errors[field].message));
+        }
+
+    } else {
+        next(error);
+    }
+
+});
 
 const Account = mongoose.model('Account', accountSchema);
 

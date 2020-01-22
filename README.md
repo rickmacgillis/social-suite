@@ -1,4 +1,2 @@
-### Discontinued
-
-# social-suite
+# Social Suite
 Open source social post scheduling system
