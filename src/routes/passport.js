@@ -12,7 +12,7 @@ passport.use(new LinkedInStrategy({
     clientID: process.env.LINKEDIN_CONSUMER_ID,
     clientSecret: process.env.LINKEDIN_CONSUMER_SECRET,
     callbackURL: process.env.APP_URL + '/settings/connected-accounts?provider=linkedin',
-    scope: ['r_emailaddress', 'r_liteprofile'],
+    scope: ['r_emailaddress', 'r_liteprofile', 'w_member_social'],
     state: true,
 }, (accessToken, refreshToken, profile, done) => done(null, profile)));
 
@@ -20,14 +20,12 @@ passport.use(new TwitterStrategy({
     consumerKey: process.env.TWITTER_CONSUMER_KEY,
     consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
     callbackURL: process.env.API_URL + '/accounts/connect/twitter/accessToken',
-  },
-  (token, tokenSecret, profile, done) => {
-      
+},
+(token, tokenSecret, profile, done) => {
     twitterTokens['accessToken'] = token;
     twitterTokens['accessTokenSecret'] = tokenSecret;
     done(null, profile);
-
-  }));
+}));
 
 const failureRedirect = process.env.APP_URL + '/settings/connected-accounts?failed=1';
 const router = express.Router();
